@@ -14,6 +14,7 @@ from dattri.func.projection import (
     random_project,
 )
 
+import pytest
 
 class TestBasicProjector(unittest.TestCase):
     """Test basic projector functions."""
@@ -42,10 +43,6 @@ class TestBasicProjector(unittest.TestCase):
         assert projected_grads.shape == (10, self.proj_dim)
 
 
-@unittest.skipUnless(
-    torch.cuda.is_available(),
-    "CUDA is not available",
-)
 class TestCudaProjector(unittest.TestCase):
     """Test cuda projector function."""
 
@@ -68,6 +65,7 @@ class TestCudaProjector(unittest.TestCase):
             dtype=torch.float32,
         )
 
+    @pytest.mark.gpu
     def test_project_output_shape(self):
         """Test output shape."""
         grads = torch.randn(64, self.feature_dim, device=self.device)
@@ -76,10 +74,6 @@ class TestCudaProjector(unittest.TestCase):
         assert projected_grads.shape == (64, self.proj_dim)
 
 
-@unittest.skipUnless(
-    torch.cuda.is_available(),
-    "CUDA is not available",
-)
 class TestChunkedCudaProjector(unittest.TestCase):
     """Test chunked cuda projector function."""
 
@@ -125,6 +119,7 @@ class TestChunkedCudaProjector(unittest.TestCase):
             dtype=self.dtype,
         )
 
+    @pytest.mark.gpu
     def test_project_output_shape(self):
         """Test the projection output shape."""
         grads = {
@@ -407,10 +402,7 @@ class TestGetProjection(unittest.TestCase):
         result_1 = project(small_gradient)
         assert result_1.shape == (test_batch_size, self.proj_dim)
 
-    @unittest.skipUnless(
-        torch.cuda.is_available(),
-        "CUDA is not available",
-    )
+    @pytest.mark.gpu
     def test_cudaprojector(self):
         """Test functionality of CudaProjector."""
         test_batch_size = 32
@@ -436,10 +428,7 @@ class TestGetProjection(unittest.TestCase):
         result_2 = project(small_gradient)
         assert result_2.shape == (test_batch_size, self.proj_dim)
 
-    @unittest.skipUnless(
-        torch.cuda.is_available(),
-        "CUDA is not available",
-    )
+    @pytest.mark.gpu
     def test_chunkedcudaprojector(self):
         """Test functionality of ChunkedCudaProjector."""
         test_batch_size = 64
@@ -500,10 +489,7 @@ class TestGetProjection(unittest.TestCase):
         result = project(test_tensor)
         assert result.shape == (test_batch_size, self.proj_dim)
 
-    @unittest.skipUnless(
-        torch.cuda.is_available(),
-        "CUDA is not available",
-    )
+    @pytest.mark.gpu
     def test_tensor_input_cuda(self):
         """Test the usage of tensor input."""
         test_batch_size = 64
@@ -522,10 +508,7 @@ class TestGetProjection(unittest.TestCase):
         result = project(test_tensor)
         assert result.shape == (test_batch_size, self.proj_dim)
 
-    @unittest.skipUnless(
-        torch.cuda.is_available(),
-        "CUDA is not available",
-    )
+    @pytest.mark.gpu
     def test_tensor_input_chunked_cuda(self):
         """Test the usage of tensor input."""
         feature_batch_size = 4
@@ -678,10 +661,7 @@ class TestProjectionDtypes(unittest.TestCase):
         assert result.shape == (self.test_batch_size, self.proj_dim)
         assert result.dtype == torch.bfloat16
 
-    @unittest.skipUnless(
-        torch.cuda.is_available(),
-        "CUDA is not available",
-    )
+    @pytest.mark.gpu
     def test_cudaprojector_float64(self):
         """Test CudaProjector with float64 dtype."""
         test_batch_size = 32
@@ -708,10 +688,7 @@ class TestProjectionDtypes(unittest.TestCase):
         assert result.shape == (test_batch_size, self.proj_dim)
         assert result.dtype == torch.float64
 
-    @unittest.skipUnless(
-        torch.cuda.is_available(),
-        "CUDA is not available",
-    )
+    @pytest.mark.gpu
     def test_cudaprojector_float32(self):
         """Test CudaProjector with float32 dtype."""
         test_batch_size = 32
@@ -738,10 +715,7 @@ class TestProjectionDtypes(unittest.TestCase):
         assert result.shape == (test_batch_size, self.proj_dim)
         assert result.dtype == torch.float32
 
-    @unittest.skipUnless(
-        torch.cuda.is_available(),
-        "CUDA is not available",
-    )
+    @pytest.mark.gpu
     def test_cudaprojector_float16(self):
         """Test CudaProjector with float16 dtype."""
         test_batch_size = 32
@@ -768,10 +742,7 @@ class TestProjectionDtypes(unittest.TestCase):
         assert result.shape == (test_batch_size, self.proj_dim)
         assert result.dtype == torch.float16
 
-    @unittest.skipUnless(
-        torch.cuda.is_available(),
-        "CUDA is not available",
-    )
+    @pytest.mark.gpu
     def test_cudaprojector_bfloat16(self):
         """Test CudaProjector with bfloat16 dtype."""
         test_batch_size = 32
