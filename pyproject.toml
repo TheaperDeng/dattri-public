@@ -21,6 +21,7 @@ dependencies = [
     "numpy>=1.25",
     "scipy>=1.11",
     "pyyaml",
+    "tqdm",
     "pretty_midi"
 ]
 
@@ -28,8 +29,8 @@ dependencies = [
 homepage = "https://github.com/TRAIS-Lab/dattri"
 
 [project.optional-dependencies]
-fast_jl = ["fast_jl"]
-test = ["build", "pytest", "pre-commit", "ruff", "darglint", "scikit-learn", "pretty_midi", "requests", "matplotlib", "pyparsing"]
+test = ["build", "pytest", "pre-commit", "ruff", "darglint", "scikit-learn", "pretty_midi", "requests", "matplotlib", "pyparsing", "torch>=2.2.0", "torchvision>=0.17.0", "sjlt"]
+sjlt = ["sjlt"]
 
 [tool.setuptools.packages]
 find = {}
@@ -44,6 +45,9 @@ dattri = ["py.typed"]
 [tool.ruff]
 exclude = [
     "docs/",
+    "dattri/algorithm/logra/core",
+    "dattri/algorithm/logra/offload",
+    "dattri/algorithm/logra/utils",
     "dattri/benchmark/datasets/shakespeare_char",
     "dattri/benchmark/datasets/tinystories",
     "dattri/benchmark/models",
@@ -51,11 +55,14 @@ exclude = [
     "experiments/",
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"dattri/algorithm/logra/logra.py" = ["PLR0914", "PLR0912"]
+
+
 [tool.ruff.lint]
 preview = true
 select = ["ALL"]
 ignore = [
-    "ANN101",  # strict rule on .self type annotation
     "ANN002",  # unnecessarily strict rule
     "ANN003",  # unnecessarily strict rule
     "D203",    # conflict with D211
@@ -73,7 +80,12 @@ ignore = [
     "FBT002",  # Boolean default positional argument in function definition
     "PLC0415", # strict rule on postion of importing modules
     "C901",    # too many parameters in function
+    "RUF052",  # strict rule on dummy variables
+    "RUF100",  # allow unused noqa for compatibility with different versions of checkers
+    "SLF001", # private member access
+    "DOC201",  # don't need return in every docstring
 ]
+
 
 [tool.ruff.lint.extend-per-file-ignores]
 "__init__.py" = [
