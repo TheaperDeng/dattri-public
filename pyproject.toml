@@ -12,7 +12,7 @@ authors = [
     {name = "TRAIS-Lab", email = "jiaqima.mle@gmail.com"}
 ]
 classifiers = [
-    "License :: OSI Approved :: Apache Software License",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: Implementation :: CPython",
@@ -20,23 +20,23 @@ classifiers = [
 dependencies = [
     "numpy>=1.25",
     "scipy>=1.11",
-    "torch>=2.2.0",
     "pyyaml",
+    "pretty_midi"
 ]
 
 [project.urls]
 homepage = "https://github.com/TRAIS-Lab/dattri"
 
 [project.optional-dependencies]
-fast = ["fast_jl"]
-test = ["build", "pytest", "pre-commit", "ruff", "darglint", "scikit-learn", "pretty_midi", "requests"]
+fast_jl = ["fast_jl"]
+test = ["build", "pytest", "pre-commit", "ruff", "darglint", "scikit-learn", "pretty_midi", "requests", "matplotlib", "pyparsing"]
 
 [tool.setuptools.packages]
 find = {}
 
 [project.entry-points.console_scripts]
-dattri_retrain="dattri.scripts.dattri_retrain:main"
-dattri_retrain_nanogpt="dattri.scripts.dattri_retrain_nanogpt:main"
+dattri_retrain="dattri.script.dattri_retrain:main"
+dattri_retrain_nanogpt="dattri.script.dattri_retrain_nanogpt:main"
 
 [tool.setuptools.package-data]
 dattri = ["py.typed"]
@@ -47,7 +47,8 @@ exclude = [
     "dattri/benchmark/datasets/shakespeare_char",
     "dattri/benchmark/datasets/tinystories",
     "dattri/benchmark/models",
-    "example/"
+    "examples/",
+    "experiments/",
 ]
 
 [tool.ruff.lint]

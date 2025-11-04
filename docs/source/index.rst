@@ -14,13 +14,17 @@
 - Deploy existing data attribution methods to PyTorch models
   - e.g., Influence Function, TracIn, RPS, TRAK, ...
 - Develop new data attribution methods with efficient implementation of low-level utility functions
-  - e.g., HVP/IHVP, random projection, dropout ensembling, ...
+  - e.g., Hessian (HVP/IHVP), Fisher Information Matrix (IFVP), random projection, dropout ensembling, ...
 - Benchmark data attribution methods with standard benchmark settings
   - e.g., MNIST-10+LR/MLP, CIFAR-10/2+ResNet-9, MAESTRO + Music Transformer, Shakespeare + nanoGPT, ...
 
+.. seealso::
+
+See also our [paper](https://arxiv.org/pdf/2410.04555), published in the NeurIPS 2024 Datasets and Benchmarks Track.
+
 .. toctree::
    :maxdepth: 1
-   :caption: Attribution Methods:
+   :caption: Attribution Task and Attributors:
 
    api/task.rst
    api/algorithm.rst

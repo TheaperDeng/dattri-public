@@ -1,11 +1,11 @@
-"""This module implement TracIn."""
+"""This module implements the TracIn attributor."""
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict
 
 if TYPE_CHECKING:
-    from typing import Optional
+    from typing import List, Optional, Union
 
     from dattri.task import AttributionTask
 
@@ -29,9 +29,10 @@ class TracInAttributor(BaseAttributor):
         weight_list: Tensor,
         normalized_grad: bool,
         projector_kwargs: Optional[Dict[str, Any]] = None,
+        layer_name: Optional[Union[str, List[str]]] = None,
         device: str = "cpu",
     ) -> None:
-        """TracIn attributor initialization.
+        """Initialize the TracIn attributor.
 
         Args:
             task (AttributionTask): The task to be attributed. Please refer to the
@@ -42,6 +43,11 @@ class TracInAttributor(BaseAttributor):
             normalized_grad (bool): Whether to apply normalization to gradients.
             projector_kwargs (Optional[Dict[str, Any]]): The keyword arguments for the
                 projector.
+            layer_name (Optional[Union[str, List[str]]]): The name of the layer to be
+                used to calculate the train/test representations. If None, full
+                parameters are used. This should be a string or a list of strings
+                if multiple layers are needed. The name of layer should follow the
+                key of model.named_parameters(). Default: None.
             device (str): The device to run the attributor. Default is cpu.
         """
         self.task = task
@@ -52,6 +58,7 @@ class TracInAttributor(BaseAttributor):
         if projector_kwargs is not None:
             self.proj_seed = self.projector_kwargs.get("proj_seed", 0)
         self.normalized_grad = normalized_grad
+        self.layer_name = layer_name
         self.device = device
         self.full_train_dataloader = None
         # to get per-sample gradients for a mini-batch of train/test samples
@@ -75,7 +82,7 @@ class TracInAttributor(BaseAttributor):
                 means that only a part of the training set's influence is calculated.
                 The dataloader should not be shuffled.
             test_dataloader (torch.utils.data.DataLoader): The dataloader for
-                test samples to calculate the influence. The dataloader should not\
+                test samples to calculate the influence. The dataloader should not
                 be shuffled.
 
         Raises:
@@ -100,11 +107,25 @@ class TracInAttributor(BaseAttributor):
         )
 
         # iterate over each checkpoint (each ensemble)
-        for ckpt_index, ckpt_weight in zip(
+        for ckpt_idx, ckpt_weight in zip(
             range(len(self.task.get_checkpoints())),
             self.weight_list,
         ):
-            parameters, _ = self.task.get_param(index=ckpt_index)
+            parameters, _ = self.task.get_param(
+                ckpt_idx=ckpt_idx,
+                layer_name=self.layer_name,
+            )
+            if self.layer_name is not None:
+                self.grad_target_func = self.task.get_grad_target_func(
+                    in_dims=(None, 0),
+                    layer_name=self.layer_name,
+                    ckpt_idx=ckpt_idx,
+                )
+                self.grad_loss_func = self.task.get_grad_loss_func(
+                    in_dims=(None, 0),
+                    layer_name=self.layer_name,
+                    ckpt_idx=ckpt_idx,
+                )
 
             for train_batch_idx, train_batch_data_ in enumerate(
                 tqdm(
@@ -130,7 +151,7 @@ class TracInAttributor(BaseAttributor):
                     # param index as ensemble id
                     train_batch_grad = self.train_random_project(
                         torch.nan_to_num(grad_t),
-                        ensemble_id=ckpt_index,
+                        ensemble_id=ckpt_idx,
                     )
                 else:
                     train_batch_grad = torch.nan_to_num(grad_t)
@@ -138,7 +159,7 @@ class TracInAttributor(BaseAttributor):
                 for test_batch_idx, test_batch_data_ in enumerate(
                     tqdm(
                         test_dataloader,
-                        desc="calculating gradient of training set...",
+                        desc="calculating gradient of test set...",
                         leave=False,
                     ),
                 ):
@@ -158,7 +179,7 @@ class TracInAttributor(BaseAttributor):
 
                         test_batch_grad = self.test_random_project(
                             torch.nan_to_num(grad_t),
-                            ensemble_id=ckpt_index,
+                            ensemble_id=ckpt_idx,
                         )
                     else:
                         test_batch_grad = torch.nan_to_num(grad_t)

@@ -5,9 +5,8 @@ import unittest
 
 import torch
 
-from dattri.metrics.ground_truth import calculate_lds_ground_truth
-from dattri.metrics.metrics import lds
-from dattri.model_utils.retrain import retrain_lds
+from dattri.metric import calculate_lds_ground_truth, lds
+from dattri.model_util.retrain import retrain_lds
 
 
 class TestLDSFunction(unittest.TestCase):
@@ -27,7 +26,7 @@ class TestLDSFunction(unittest.TestCase):
         indices = torch.tensor([[0, 1], [0, 2], [1, 2]])
         ground_truth = (gt_values, indices)
 
-        lds_corr, lds_pval = lds(score, ground_truth)
+        lds_corr, lds_pval = lds(score.T, ground_truth)
 
         expected_corr = torch.tensor([1.0, 0.8660254037844387], dtype=torch.float32)
         expected_pval = torch.tensor([0.0, 0.3333333333333332], dtype=torch.float32)
