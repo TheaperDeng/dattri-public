@@ -2,8 +2,7 @@
 <img src="assets/images/logo.png" alt="logo" width="300">
 </div>
 
-# A Library for Efficient Data Attribution
-
+# `dattri`: A Library for Efficient Data Attribution
 [![Doc](https://img.shields.io/badge/Doc-API-00E64D.svg)](https://trais-lab.github.io/dattri/)
 [![PyPI version](https://img.shields.io/pypi/v/dattri)](https://pypi.org/project/dattri/)
 [![Paper](https://img.shields.io/badge/Paper-NeurIPS24-00bfff.svg)](https://arxiv.org/pdf/2410.04555)
